@@ -42,7 +42,7 @@ spec:
           - "--localWalletDir=/storage/wallet"
           {{- if .Values.global.products.singularity }}
           - "--experimentalSingularityStore"
-          - "--experimentalRemoteSingularityAPIUrl=http://singularity-api:9090/api"
+          - "--experimentalRemoteSingularityAPIUrl=http://singularity-api:9090/"
           {{- end }}
           {{- if (index .Values.global.products (index .Values.product)).customFlags }}
           {{- range $key, $value := (index .Values.global.products (index .Values.product)).customFlags }}
