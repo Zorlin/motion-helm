@@ -1,0 +1,76 @@
+{{- $sizeConfig := include "motion.getSizeConfig" . | fromYaml }}
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ .Values.global.customer.name }}-{{ .Values.product }}
+  namespace: customer-{{ .Values.global.customer.name }}
+  annotations:
+    argocd.argoproj.io/sync-wave: "15"
+  labels:
+    app: {{ .Values.global.customer.name }}-{{ .Values.product }}
+spec:
+  serviceName: {{ .Values.global.customer.name }}-{{ .Values.product }}
+  podManagementPolicy: "Parallel"
+  selector:
+    matchLabels:
+      app: {{ .Values.global.customer.name }}-{{ .Values.product }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.global.customer.name }}-{{ .Values.product }}
+    spec:
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      initContainers:
+      - name: init-storage
+        image: busybox
+        command: ["sh", "-c", "mkdir -p /storage/motion ; chown -R 1337:1337 /storage/"]
+        securityContext:
+          runAsUser: 0
+          runAsGroup: 0
+        volumeMounts:
+        - name: storage
+          mountPath: /storage
+      containers:
+      - name: {{ .Values.product }}
+        image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
+        securityContext:
+          {{- toYaml .Values.securityContext | nindent 10 }}
+        workingDir: /storage
+        command:
+          - "motion"
+          - "--localWalletDir=/storage/wallet"
+          {{- if .Values.global.products.singularity }}
+          - "--experimentalSingularityStore"
+          - "--experimentalRemoteSingularityAPIUrl=http://singularity-api:9090/api"
+          {{- end }}
+          {{- if (index .Values.global.products (index .Values.product)).customFlags }}
+          {{- range $key, $value := (index .Values.global.products (index .Values.product)).customFlags }}
+          - "--{{ $key }}={{ $value }}"
+          {{- end }}
+          {{- end }}
+        envFrom:
+          - configMapRef:
+              name: {{ .Values.global.customer.name }}-{{ .Values.product }}-config
+        ports:
+          - name: motion-http
+            containerPort: 40080
+            protocol: TCP
+        # readinessProbe:
+        #  httpGet:
+        #    path: /health/ping
+        #    port: motion-http
+        resources:
+          limits:
+            cpu: "{{ $sizeConfig.cpuLimit }}"
+            memory: "{{ $sizeConfig.memoryLimit }}"
+          requests:
+            cpu: "{{ $sizeConfig.cpuRequest }}"
+            memory: "{{ $sizeConfig.memoryRequest }}"
+        volumeMounts:
+          - name: storage
+            mountPath: /storage
+      volumes:
+      - name: storage
+        persistentVolumeClaim:
+          claimName: {{ .Values.global.customer.name }}-{{ .Values.product }}-storage

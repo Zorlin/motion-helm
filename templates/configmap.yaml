@@ -1,0 +1,21 @@
+{{- define "decodePassword" }}
+  {{- $password := . }}
+  {{- if or (eq $password "null") (eq $password nil) }}
+    {{- "PASSWORD-NOT-YET-FOUND" }}
+  {{- else }}
+    {{- $password | b64dec }}
+  {{- end }}
+{{- end }}
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Values.global.customer.name }}-{{ .Values.product }}-config
+  namespace: customer-{{ .Values.global.customer.name }}
+  annotations:
+    argocd.argoproj.io/sync-wave: "10"
+data:
+  MOTION_STORE_DIR: /storage/motion
+  {{- if (index .Values.global.products (index .Values.product)).customEnv }}
+{{ (index .Values.global.products (index .Values.product)).customEnv | indent 2 }}
+  {{- end }}
