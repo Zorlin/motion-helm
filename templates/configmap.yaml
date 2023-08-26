@@ -15,7 +15,11 @@ metadata:
   annotations:
     argocd.argoproj.io/sync-wave: "10"
 data:
+  {{- if not .Values.global.products.singularity }}
   MOTION_STORE_DIR: /storage/motion
+  {{- else }}
+  MOTION_STORE_DIR: /storage/singularity
+  {{- end }}
   {{- if (index .Values.global.products (index .Values.product)).customEnv }}
 {{ (index .Values.global.products (index .Values.product)).customEnv | indent 2 }}
   {{- end }}
