@@ -10,7 +10,7 @@ image:
   repository: ghcr.io/filecoin-project/motion
   pullPolicy: Always
   # Overrides the image tag whose default is the chart appVersion.
-  tag: "main"
+  tag: "0.2.0"
 
 imagePullSecrets: []
 nameOverride: ""
