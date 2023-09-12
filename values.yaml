@@ -81,3 +81,5 @@ global:
     motion:
       tshirtSize: basic
       ingressName: test.motion.fdi.network
+    singularity:
+      foo: bar
