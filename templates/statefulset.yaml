@@ -54,22 +54,6 @@ spec:
         envFrom:
           - configMapRef:
               name: {{ .Values.global.customer.name }}-{{ .Values.product }}-config
-        env:
-          - name: "LOTUS_TEST"
-          - name: "LOTUS_API"
-          - name: "LOTUS_TOKEN"
-          - name: "MOTION_STORAGE_PROVIDERS"
-          - name: "MOTION_PRICE_PER_GIB_EPOCH"
-          - name: "MOTION_PRICE_PER_GIB"
-          - name: "MOTION_PRICE_PER_DEAL"
-          - name: "MOTION_DEAL_START_DELAY"
-          - name: "MOTION_DEAL_DURATION"
-          - name: "MOTION_SINGULARITY_MAX_CAR_SIZE"
-          - name: "MOTION_SINGULARITY_PACK_THRESHOLD"
-          - name: "MOTION_SINGULARITY_SCHEDULE_CRON"
-          - name: "MOTION_SINGULARITY_SCHEDULE_DEAL_NUMBER"
-          - name: "MOTION_WALLET_KEY"
-          - name: "MOTION_VERIFIED_DEAL"
         ports:
           - name: motion-http
             containerPort: 40080
