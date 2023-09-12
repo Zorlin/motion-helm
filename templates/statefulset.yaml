@@ -40,7 +40,6 @@ spec:
         workingDir: /storage
         command:
           - "motion"
-          - "--localWalletDir=/storage/wallet"
           {{- if .Values.global.products.singularity }}
           - "--experimentalSingularityStore"
           - "--experimentalRemoteSingularityAPIUrl=http://singularity-api:9090"
